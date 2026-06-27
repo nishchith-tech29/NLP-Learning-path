@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 2 - NLP Text Preprocessing, Bag of Words, and N-Grams</title>
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --primary-blue: #0056b3;
+            --primary-light: #e3f2fd;
+            --highlight-orange: #d35400;
+            --highlight-light: #fdf2e9;
+            --badge-green: #27ae60;
+            --badge-green-light: #e8f5e9;
+            --text-main: #333333;
+            --text-muted: #6c757d;
+            --gray-badge: #e9ecef;
+            --code-bg: #1e1e1e;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4 {
+            color: var(--primary-blue);
+            margin-top: 0;
+        }
+        
+        h2 {
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        p {
+            margin-bottom: 15px;
+        }
+
+        /* Header Component */
+        .page-header {
+            background: linear-gradient(135deg, #0056b3, #003d82);
+            color: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-header h1 {
+            color: white;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .page-header .meta-info {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .header-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+            backdrop-filter: blur(5px);
+        }
+
+        /* Content Cards */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Timestamps */
+        .timestamp {
+            background-color: var(--gray-badge);
+            color: var(--text-muted);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 700;
+            display: inline-block;
+            vertical-align: middle;
+            font-family: monospace;
+        }
+
+        /* Table of Contents */
+        .toc {
+            background-color: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .toc h2 { border: none; margin-bottom: 15px; }
+        
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .toc li {
+            margin-bottom: 10px;
+        }
+        
+        .toc a {
+            text-decoration: none;
+            color: var(--primary-blue);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            transition: color 0.2s ease;
+        }
+        
+        .toc a:hover {
+            color: var(--highlight-orange);
+        }
+        
+        .toc a::before {
+            content: '→';
+            margin-right: 10px;
+            color: var(--highlight-orange);
+        }
+
+        /* Boxes */
+        .box {
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 5px solid;
+            position: relative;
+        }
+
+        .box-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: block;
+            font-size: 1.1em;
+        }
+
+        .def-box {
+            background-color: var(--primary-light);
+            border-color: var(--primary-blue);
+        }
+        
+        .def-box .box-title { color: var(--primary-blue); }
+
+        .example-box {
+            background-color: var(--highlight-light);
+            border-color: var(--highlight-orange);
+        }
+        
+        .example-box .box-title { color: var(--highlight-orange); }
+
+        .warning-box {
+            background-color: #fbe9e7;
+            border-color: #e64a19;
+        }
+        
+        .warning-box .box-title { color: #e64a19; }
+
+        .interview-box {
+            background-color: var(--badge-green-light);
+            border-color: var(--badge-green);
+        }
+        
+        .interview-box .box-title { color: var(--badge-green); }
+
+        .info-box {
+            background-color: #f3f0ff;
+            border-color: #651fff;
+        }
+        
+        .info-box .box-title { color: #651fff; }
+
+        /* Code Blocks */
+        .code-container {
+            position: relative;
+            margin: 20px 0;
+        }
+        
+        .code-lang {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: #444;
+            color: #fff;
+            padding: 2px 10px;
+            border-bottom-left-radius: 8px;
+            border-top-right-radius: 8px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        
+        pre {
+            background-color: var(--code-bg);
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.95em;
+            margin: 0;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .keyword { color: #569cd6; font-weight: bold; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; font-style: italic; }
+        .function { color: #dcdcaa; }
+        .number { color: #b5cea8; }
+        .operator { color: #d4d4d4; }
+
+        /* Visual Components (HTML/CSS Diagrams) */
+        .pipeline-diagram {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 30px 0;
+            align-items: center;
+        }
+        
+        @media(min-width: 768px) {
+            .pipeline-diagram {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+        }
+        
+        .pipeline-step {
+            background: white;
+            border: 2px solid var(--primary-blue);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            flex: 1;
+            width: 100%;
+            position: relative;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            font-weight: 600;
+            color: var(--primary-blue);
+        }
+        
+        .pipeline-arrow {
+            color: var(--highlight-orange);
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        @media(max-width: 767px) {
+            .pipeline-arrow { transform: rotate(90deg); }
+        }
+
+        .matrix-diagram {
+            display: inline-block;
+            background: #fff;
+            border-left: 2px solid #333;
+            border-right: 2px solid #333;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 1.2em;
+            text-align: center;
+            margin: 20px auto;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            background-color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: var(--primary-blue);
+            color: white;
+            font-weight: 600;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        tr:hover {
+            background-color: var(--primary-light);
+        }
+
+        /* Tags */
+        .tag {
+            display: inline-block;
+            background: var(--primary-light);
+            color: var(--primary-blue);
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            margin: 2px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <header class="page-header">
+        <div class="header-badge">Day 2</div>
+        <h1>Text Pre-processing & Vectorization</h1>
+        <p style="font-size: 1.2em; opacity: 0.9;">Bag of Words, N-Grams, and Practical Implementation with NLTK</p>
+        <div class="meta-info">
+            <span class="header-badge">Instructor: Krish Naik</span>
+            <span class="header-badge">Duration: ~1h 55m</span>
+            <span class="header-badge">Domain: Natural Language Processing (NLP)</span>
+        </div>
+    </header>
+
+    <nav class="toc">
+        <h2>Table of Contents</h2>
+        <ul>
+            <li><a href="#intro">1. Introduction to Text Pre-processing</a></li>
+            <li><a href="#terminologies">2. Essential NLP Terminologies</a></li>
+            <li><a href="#ohe">3. One-Hot Encoding in NLP</a></li>
+            <li><a href="#bow">4. Bag of Words (BoW) & Binary BoW</a></li>
+            <li><a href="#semantics">5. Understanding Semantic Meaning (Cosine Similarity)</a></li>
+            <li><a href="#ngrams">6. N-Grams (Unigrams, Bigrams, Trigrams)</a></li>
+            <li><a href="#implementation">7. Practical Python Implementation (NLTK & Scikit-Learn)</a></li>
+            <li><a href="#cheatsheet">8. Final Cheat Sheet & Revision Notes</a></li>
+        </ul>
+    </nav>
+
+    <section id="intro" class="card">
+        <h2>1. Introduction to Text Pre-processing <span class="timestamp">[00:01:51]</span></h2>
+        
+        <p>In Machine Learning and Deep Learning, algorithms fundamentally understand numbers (vectors and matrices), not raw text. <strong>Text Pre-processing</strong> is the systematic pipeline of converting unstructured text data into a clean, structured, and mathematical format.</p>
+        
+        <div class="def-box box">
+            <span class="box-title">Definition: Text Pre-processing</span>
+            <p>The sequence of cleaning and transforming raw text into a normalized format, ultimately mapping words to numerical vectors so that machine learning models can process them.</p>
+        </div>
+
+        <h3>The Standard NLP Pipeline</h3>
+        <p>Before we can classify sentiments or build chatbots, the text goes through several fundamental transformations.</p>
+
+        <div class="pipeline-diagram">
+            <div class="pipeline-step">Raw Text Data</div>
+            <div class="pipeline-arrow">➔</div>
+            <div class="pipeline-step">Cleaning (RegEx, Lowercasing)</div>
+            <div class="pipeline-arrow">➔</div>
+            <div class="pipeline-step">Tokenization</div>
+            <div class="pipeline-arrow">➔</div>
+            <div class="pipeline-step">Stemming / Lemmatization & Stopwords</div>
+            <div class="pipeline-arrow">➔</div>
+            <div class="pipeline-step">Vectorization (BoW, TF-IDF, Word2Vec)</div>
+        </div>
+        
+        <div class="interview-box box">
+            <span class="box-title">Interview Tip: Why Pre-process?</span>
+            <p>Interviewers often ask why we can't just pass text directly to neural networks. The answer is twofold: <strong>Dimensionality</strong> (raw text has too many unique, unnormalized variations of the same word, causing sparse and massive input sizes) and <strong>Computability</strong> (models require numerical tensors to compute gradients).</p>
+        </div>
+    </section>
+
+    <section id="terminologies" class="card">
+        <h2>2. Essential NLP Terminologies <span class="timestamp">[00:07:08]</span></h2>
+        
+        <p>To communicate effectively as an NLP engineer, you must master the fundamental vocabulary. Let's break down the core hierarchy of textual data.</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Term</th>
+                    <th>Definition</th>
+                    <th>Analogy / Example</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Corpus</strong></td>
+                    <td>The entire collection of text data you are working with.</td>
+                    <td>A complete book, or the combination of <em>all</em> customer reviews in your dataset.</td>
+                </tr>
+                <tr>
+                    <td><strong>Document</strong></td>
+                    <td>A single, independent data point within the corpus.</td>
+                    <td>A single sentence, a single tweet, or one individual customer review (e.g., <code>"The food is good"</code>).</td>
+                </tr>
+                <tr>
+                    <td><strong>Vocabulary</strong></td>
+                    <td>The set of all <em>unique</em> words present across the entire corpus.</td>
+                    <td>A dictionary mapping every unique word in the dataset. If a dataset has 1 million words, the vocabulary might only be 10,000 unique words.</td>
+                </tr>
+                <tr>
+                    <td><strong>Word (Token)</strong></td>
+                    <td>The smallest unit of text processed by the model.</td>
+                    <td><code>"food"</code>, <code>"good"</code>, <code>"pizza"</code>.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="example-box box">
+            <span class="box-title">Example Breakdown</span>
+            <p><strong>Corpus:</strong> [D1: "Pizza is good", D2: "Burger is bad"]</p>
+            <p><strong>Documents:</strong> Two documents (D1 and D2).</p>
+            <p><strong>Vocabulary:</strong> {"pizza", "is", "good", "burger", "bad"} (Count = 5 unique words).</p>
+        </div>
+    </section>
+
+    <section id="ohe" class="card">
+        <h2>3. One-Hot Encoding in NLP <span class="timestamp">[00:17:34]</span></h2>
+
+        <p>One-Hot Encoding (OHE) is the most primitive form of converting words into vectors. In this technique, each word in a document is represented by a vector of binary values.</p>
+
+        <h3>How it Works</h3>
+        <p>Unlike standard categorical OHE where the vector size equals the <em>entire vocabulary</em>, in basic NLP OHE, a sentence of <em>N</em> words is represented as a matrix where each word is a vector of length <em>N</em>, with a 1 at its index and 0 elsewhere.</p>
+
+        <div class="matrix-diagram">
+            Document: "a man eat"<br><br>
+            [1, 0, 0] ➔ "a"<br>
+            [0, 1, 0] ➔ "man"<br>
+            [0, 0, 1] ➔ "eat"
+        </div>
+
+        <div class="warning-box box">
+            <span class="box-title">Why One-Hot Encoding Fails for Text <span class="timestamp">[00:23:00]</span></span>
+            <ul>
+                <li><strong>Sparsity:</strong> Matrices become massive and filled mostly with zeros. This wastes RAM and massively increases computational time.</li>
+                <li><strong>Out of Vocabulary (OOV):</strong> If the test data contains a word not present in the training set (e.g., "dog"), the model instantly breaks because it has no predefined vector position for it.</li>
+                <li><strong>Variable Lengths:</strong> Machine Learning models expect fixed-size inputs. OHE creates matrices based on sentence length (e.g., a 4-word sentence yields a 4x4 representation, a 3-word sentence yields a 3x3). Models cannot train on varying input shapes.</li>
+                <li><strong>No Semantic Meaning:</strong> The distance between the vector for "king" and "queen" is exactly the same as the distance between "king" and "apple". It captures zero relational context.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="bow" class="card">
+        <h2>4. Bag of Words (BoW) & Binary BoW <span class="timestamp">[00:31:24]</span></h2>
+        
+        <p>To fix the variable length issue of One-Hot Encoding, we use the <strong>Bag of Words</strong> approach. BoW treats a document as an unordered "bag" (multiset) of words, ignoring grammar and word order but maintaining multiplicity (frequency).</p>
+
+        <h3>Step-by-Step Mechanism</h3>
+        <ol>
+            <li><strong>Clean Text:</strong> Lowercase all words and remove punctuation.</li>
+            <li><strong>Remove Stop Words:</strong> Strip out non-informative words like "is", "a", "the", "and".</li>
+            <li><strong>Build Vocabulary:</strong> Extract all unique remaining words across the corpus. Order them usually by frequency.</li>
+            <li><strong>Vectorize:</strong> For each document, create a vector of the size of the vocabulary. Fill the vector with the frequency count of each word.</li>
+        </ol>
+
+        <div class="example-box box">
+            <span class="box-title">Real-World Example</span>
+            <p><strong>D1:</strong> "He is a good boy"<br>
+               <strong>D2:</strong> "She is a good girl"<br>
+               <strong>D3:</strong> "Boy and girl are good"</p>
+            <p><em>After stop word removal (is, a, he, she, and, are):</em></p>
+            <p><strong>D1:</strong> "good boy"<br>
+               <strong>D2:</strong> "good girl"<br>
+               <strong>D3:</strong> "boy girl good"</p>
+            <p><strong>Vocabulary (by descending overall frequency):</strong> [Feature 1: "good", Feature 2: "boy", Feature 3: "girl"]</p>
+            
+            <table style="margin-top: 15px;">
+                <tr>
+                    <th>Document</th>
+                    <th>"good" (F1)</th>
+                    <th>"boy" (F2)</th>
+                    <th>"girl" (F3)</th>
+                    <th>Final Vector</th>
+                </tr>
+                <tr>
+                    <td>D1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td><strong>[1, 1, 0]</strong></td>
+                </tr>
+                <tr>
+                    <td>D2</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td><strong>[1, 0, 1]</strong></td>
+                </tr>
+                <tr>
+                    <td>D3</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td><strong>[1, 1, 1]</strong></td>
+                </tr>
+            </table>
+        </div>
+
+        <h3>Binary Bag of Words <span class="timestamp">[00:39:56]</span></h3>
+        <p>In standard BoW, if the word "good" appears 5 times in a document, the vector holds the integer <code>5</code>. In <strong>Binary BoW</strong>, we only care about <em>presence</em> vs. <em>absence</em>. If a word appears 1 or 100 times, the value is simply clamped to <code>1</code>. This is excellent for simple Sentiment Analysis where the mere presence of a negative word dictates the sentiment, regardless of frequency.</p>
+
+        <div class="warning-box box">
+            <span class="box-title">Advantages vs Disadvantages of BoW <span class="timestamp">[00:42:40]</span></span>
+            <p><strong>Advantages:</strong> Simple, intuitive, fixes variable size problems (all vectors are now the size of the global vocabulary).</p>
+            <p><strong>Disadvantages:</strong></p>
+            <ul>
+                <li><strong>Sparsity remains:</strong> A 10,000-word vocabulary means every 5-word sentence is represented by 9,995 zeros.</li>
+                <li><strong>Out of Vocabulary (OOV):</strong> New words in test data are simply ignored and dropped.</li>
+                <li><strong>Word Ordering is Lost:</strong> "Good boy" and "Boy good" produce the exact same vector. Grammar is destroyed.</li>
+                <li><strong>Semantic Meaning is Lost:</strong> Synonyms are treated as entirely different features.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="semantics" class="card">
+        <h2>5. Understanding Semantic Meaning & Distance <span class="timestamp">[00:47:05]</span></h2>
+
+        <p>When we convert text to vectors, we map them as points in high-dimensional space. How do we tell if two sentences are similar? We calculate the distance between their vectors.</p>
+        
+        <p>In NLP (and heavily in Recommendation Systems), we avoid Euclidean distance due to the "curse of dimensionality". Instead, we use <strong>Cosine Similarity</strong>.</p>
+
+        <div class="def-box box">
+            <span class="box-title">Cosine Similarity</span>
+            <p>Cosine similarity measures the cosine of the angle between two vectors projected in a multi-dimensional space. It evaluates the orientation rather than magnitude.</p>
+            <p><strong>Formula Intuition:</strong> Similarity = $cos(\theta)$.</p>
+            <ul>
+                <li>If angle is 0° (vectors overlap): $cos(0) = 1$ (100% Similar)</li>
+                <li>If angle is 90° (orthogonal): $cos(90) = 0$ (0% Similar)</li>
+            </ul>
+        </div>
+
+        <div class="info-box box">
+            <span class="box-title">Why BoW struggles with Semantics</span>
+            <p>Because BoW treats every word as a separate orthogonal axis, "Iron Man" and "Avengers" (while semantically related movies) might share no words in their plot summaries, resulting in orthogonal vectors and a cosine similarity of 0, missing the contextual relationship.</p>
+        </div>
+    </section>
+
+    <section id="ngrams" class="card">
+        <h2>6. N-Grams (Unigrams, Bigrams, Trigrams) <span class="timestamp">[00:53:53]</span></h2>
+
+        <p>Bag of Words completely destroys word order. To retain local word ordering and capture multi-word contextual meaning, we use <strong>N-Grams</strong>.</p>
+
+        <div class="def-box box">
+            <span class="box-title">What are N-Grams?</span>
+            <p>An N-gram is a contiguous sequence of <em>n</em> items (words) from a given sample of text. Instead of treating single words as features, we treat combinations of words as features.</p>
+        </div>
+
+        <table style="margin-top: 10px;">
+            <tr>
+                <th>Type</th>
+                <th>Definition</th>
+                <th>Example for "Krish eats food"</th>
+            </tr>
+            <tr>
+                <td><strong>Unigram (1-gram)</strong></td>
+                <td>Single words (Standard BoW)</td>
+                <td>"Krish", "eats", "food"</td>
+            </tr>
+            <tr>
+                <td><strong>Bigram (2-gram)</strong></td>
+                <td>Combinations of 2 adjacent words</td>
+                <td>"Krish eats", "eats food"</td>
+            </tr>
+            <tr>
+                <td><strong>Trigram (3-gram)</strong></td>
+                <td>Combinations of 3 adjacent words</td>
+                <td>"Krish eats food"</td>
+            </tr>
+        </table>
+
+        <div class="interview-box box">
+            <span class="box-title">Interview Question: How to use multiple N-grams?</span>
+            <p><strong>Q:</strong> Can we use unigrams, bigrams, and trigrams simultaneously in a model?</p>
+            <p><strong>A:</strong> Yes! In Scikit-Learn's `CountVectorizer`, you can pass the parameter <code>ngram_range=(1, 3)</code>. This instructs the vectorizer to generate features for unigrams, bigrams, AND trigrams combined. For example, "I am not feeling well" will generate features like: "I", "am", "I am", "am not", "I am not", etc.</p>
+        </div>
+        
+        <p><strong>Advantages of N-Grams:</strong> Retains context. "Not good" (Bigram) perfectly captures negative sentiment, whereas Unigrams ("Not", "good") might confuse the model into thinking it's positive.</p>
+    </section>
+
+    <section id="implementation" class="card">
+        <h2>7. Practical Python Implementation <span class="timestamp">[01:02:10]</span></h2>
+
+        <p>Below is the complete, production-ready pipeline for executing text preprocessing and generating a Bag of Words matrix using <code>nltk</code> and <code>scikit-learn</code>.</p>
+
+        <div class="code-container">
+            <div class="code-lang">Python</div>
+            <pre>
+<span class="comment"># 1. Import necessary libraries</span>
+<span class="keyword">import</span> nltk
+<span class="keyword">import</span> re
+<span class="keyword">from</span> nltk.corpus <span class="keyword">import</span> stopwords
+<span class="keyword">from</span> nltk.stem <span class="keyword">import</span> PorterStemmer, WordNetLemmatizer
+<span class="keyword">from</span> sklearn.feature_extraction.text <span class="keyword">import</span> CountVectorizer
+
+<span class="comment"># Download required NLTK data files (Run once)</span>
+<span class="comment"># nltk.download('punkt')</span>
+<span class="comment"># nltk.download('stopwords')</span>
+<span class="comment"># nltk.download('wordnet')</span>
+
+<span class="comment"># 2. Sample Data</span>
+paragraph = <span class="string">"""Narendra Modi is the Prime Minister of India. 
+He was the Chief Minister of Gujarat. 
+People watch his YouTube channel!"""</span>
+
+<span class="comment"># 3. Tokenize into sentences</span>
+sentences = nltk.sent_tokenize(paragraph)
+
+<span class="comment"># Initialize Stemmer and Lemmatizer</span>
+stemmer = PorterStemmer()
+lemmatizer = WordNetLemmatizer()
+
+<span class="comment"># 4. Text Cleaning & Pre-processing Pipeline</span>
+corpus = []
+<span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(<span class="function">len</span>(sentences)):
+    <span class="comment"># Remove special characters using Regex (Keep only a-z and A-Z)</span>
+    review = re.sub(<span class="string">'[^a-zA-Z]'</span>, <span class="string">' '</span>, sentences[i])
+    
+    <span class="comment"># Convert to lowercase</span>
+    review = review.lower()
+    
+    <span class="comment"># Split into words</span>
+    review = review.split()
+    
+    <span class="comment"># Remove stopwords and apply Lemmatization</span>
+    review = [lemmatizer.lemmatize(word) <span class="keyword">for</span> word <span class="keyword">in</span> review <span class="keyword">if</span> word <span class="keyword">not in</span> <span class="function">set</span>(stopwords.words(<span class="string">'english'</span>))]
+    
+    <span class="comment"># Rejoin the words back into a sentence</span>
+    review = <span class="string">' '</span>.join(review)
+    corpus.append(review)
+
+<span class="function">print</span>(corpus)
+<span class="comment"># Output: ['narendra modi prime minister india', 'chief minister gujarat', 'people watch youtube channel']</span>
+
+<span class="comment"># 5. Apply Bag of Words (CountVectorizer) <span class="timestamp">[01:20:00]</span></span>
+<span class="comment"># Initialize vectorizer (use binary=True for Binary BoW)</span>
+cv = CountVectorizer(binary=<span class="keyword">False</span>, ngram_range=(<span class="number">1</span>, <span class="number">1</span>)) 
+
+<span class="comment"># Transform corpus into feature matrix</span>
+X = cv.fit_transform(corpus).toarray()
+
+<span class="comment"># View Vocabulary and Matrix</span>
+<span class="function">print</span>(cv.vocabulary_) 
+<span class="function">print</span>(X)
+            </pre>
+        </div>
+
+        <div class="info-box box">
+            <span class="box-title">Important Scikit-Learn Hyperparameters</span>
+            <ul>
+                <li><code>binary=True</code> : Enforces Binary Bag of Words (0s and 1s only).</li>
+                <li><code>ngram_range=(1, 3)</code> : Creates unigrams, bigrams, and trigrams.</li>
+                <li><code>max_features=1500</code> : Limits the vocabulary to the top 1500 most frequent words, drastically reducing <strong>sparsity</strong> and memory consumption.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="cheatsheet" class="card">
+        <h2>8. Final Cheat Sheet & Revision Notes</h2>
+        
+        <div class="box info-box">
+            <span class="box-title">Quick Recap</span>
+            <p><strong>The Core Problem:</strong> NLP requires converting text to numbers. Simple encoding creates sparse, massive matrices with no context.</p>
+            <p><strong>Step 1: Text Cleaning.</strong> Use Regex <code>re.sub('[^a-zA-Z]', ' ', text)</code> to drop punctuation. Convert to lowercase.</p>
+            <p><strong>Step 2: Tokenization.</strong> Use <code>nltk.sent_tokenize</code> (sentences) and <code>nltk.word_tokenize</code> (words).</p>
+            <p><strong>Step 3: Reduction.</strong> Use <code>stopwords</code> to remove fluff. Use Stemming (fast, cuts off suffixes, sometimes creates meaningless words like "histori") or Lemmatization (slower, dictionary-based, creates meaningful root words like "history").</p>
+            <p><strong>Step 4: Vectorization.</strong> 
+                <br>• <em>OHE:</em> Terrible for text.
+                <br>• <em>Bag of Words (BoW):</em> Counts word frequencies. Good for simple tasks, bad for grammar/semantics. Causes sparse matrices.
+                <br>• <em>N-Grams:</em> Groups neighboring words to maintain local context (e.g., Bigrams, Trigrams).
+            </p>
+        </div>
+
+        <h3>Frequently Asked Interview Questions</h3>
+        <table style="margin-top: 15px;">
+            <tr>
+                <th>Question</th>
+                <th>Expected Answer</th>
+            </tr>
+            <tr>
+                <td><strong>Stemming vs. Lemmatization?</strong></td>
+                <td>Stemming is a rule-based heuristic that hacks off suffixes (fast, prone to non-dictionary words). Lemmatization uses morphological analysis and a dictionary (WordNet) to return a valid base word (slower but highly accurate).</td>
+            </tr>
+            <tr>
+                <td><strong>What is the Sparsity Problem?</strong></td>
+                <td>When vectorizing text, the vocabulary is huge (e.g., 10,000 words). A single sentence might have 5 words, making the 10,000-dimensional vector 99.9% zeros. This wastes memory and computation.</td>
+            </tr>
+            <tr>
+                <td><strong>How do you solve Out of Vocabulary (OOV) in BoW?</strong></td>
+                <td>BoW inherently drops OOV words. To solve this properly, advanced techniques like Word2Vec, GloVe, or Subword Tokenization (used in BERT) are required.</td>
+            </tr>
+            <tr>
+                <td><strong>When would you use Binary BoW over standard BoW?</strong></td>
+                <td>In tasks like Sentiment Analysis or Spam Detection, the mere presence of a highly polarized word (e.g., "terrible" or "lottery") is enough to classify the document, rendering exact frequency counts unnecessary.</td>
+            </tr>
+        </table>
+    </section>
+
+</div>
+
+</body>
+</html>
