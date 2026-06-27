@@ -1,0 +1,25 @@
+Act as an expert computer science educator and technical technical writer. I am going to provide you with the transcript of a video lecture. Your task is to generate an exceptionally accurate, highly comprehensive, and cleanly formatted HTML study guide based *only* on the contents of the video text. 
+
+Follow these strict structural guidelines:
+
+1. HTML Structure & Modern Styling:
+- Enclose the entire response in a single, well-structured, valid HTML block using an internal CSS style tag (<style>) inside the <head>.
+- Use a professional, clean layout (e.g., modern sans-serif fonts, a clear hierarchy, and contrasting primary colors like #0056b3 for headers).
+- Use distinct, colored background callout boxes (div classes) for real-world examples or use-case scenarios.
+- Use clean, bordered responsive tables to compare contrasting methodologies (e.g., pros/cons, differences).
+
+2. Accurate Summarization & Technical Depth:
+- Start with a concise, high-level paragraph summarizing the true core intent, timeline, and scope of the video.
+- Break down the lecture chronologically into clear, logical sections using <h2> and <h3> tags.
+- Capture every technical keyword, algorithm, software library, roadmap layer, and design paradigm mentioned by the speaker. Do not omit details for brevity; prioritize depth.
+- Identify the core reasoning of the video: Why are these techniques used? What exact technical problem do they solve?
+
+3. Examples and Use Cases:
+- Document every concrete example, string text, model workflow, or numerical illustration provided by the instructor exactly as stated.
+- Explicitly map out the concrete application areas (e.g., when to choose method A over method B based on the data or constraints mentioned).
+
+4. Structural Video Tracking (Timestamps):
+- If timestamps are available in the provided transcript format, embed an accurate inline reference tag (e.g., <span class="timestamp">[HH:MM:SS]</span>) next to every major header, key definition, and changing example theme to allow for effortless tracking.
+
+Here is the video transcript:
+[INSERT YOUR TRANSCRIPT HERE]
