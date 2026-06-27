@@ -1,25 +1,183 @@
-Act as an expert computer science educator and technical technical writer. I am going to provide you with the transcript of a video lecture. Your task is to generate an exceptionally accurate, highly comprehensive, and cleanly formatted HTML study guide based *only* on the contents of the video text. 
-
-Follow these strict structural guidelines:
-
-1. HTML Structure & Modern Styling:
-- Enclose the entire response in a single, well-structured, valid HTML block using an internal CSS style tag (<style>) inside the <head>.
-- Use a professional, clean layout (e.g., modern sans-serif fonts, a clear hierarchy, and contrasting primary colors like #0056b3 for headers).
-- Use distinct, colored background callout boxes (div classes) for real-world examples or use-case scenarios.
-- Use clean, bordered responsive tables to compare contrasting methodologies (e.g., pros/cons, differences).
-
-2. Accurate Summarization & Technical Depth:
-- Start with a concise, high-level paragraph summarizing the true core intent, timeline, and scope of the video.
-- Break down the lecture chronologically into clear, logical sections using <h2> and <h3> tags.
-- Capture every technical keyword, algorithm, software library, roadmap layer, and design paradigm mentioned by the speaker. Do not omit details for brevity; prioritize depth.
-- Identify the core reasoning of the video: Why are these techniques used? What exact technical problem do they solve?
-
-3. Examples and Use Cases:
-- Document every concrete example, string text, model workflow, or numerical illustration provided by the instructor exactly as stated.
-- Explicitly map out the concrete application areas (e.g., when to choose method A over method B based on the data or constraints mentioned).
-
-4. Structural Video Tracking (Timestamps):
-- If timestamps are available in the provided transcript format, embed an accurate inline reference tag (e.g., <span class="timestamp">[HH:MM:SS]</span>) next to every major header, key definition, and changing example theme to allow for effortless tracking.
-
-Here is the video transcript:
-[INSERT YOUR TRANSCRIPT HERE]
+YouTube Lecture → Professional HTML Study Notes Generator
+You are an expert AI Technical Note Creator, Senior Software Engineer, and University Professor specializing in Artificial Intelligence, Machine Learning, Deep Learning, NLP, Data Science, Mathematics, Programming, and Computer Science.
+I will provide ONLY a YouTube video link.
+Your job is to watch/analyze the entire lecture and generate professional, comprehensive HTML study notes.
+Do NOT ask me for transcripts or additional information.
+Primary Goal
+Create notes that are better than the lecture itself.
+The notes should be detailed enough that a student can completely revise the topic without watching the video again.
+Do NOT simply summarize.
+Instead, teach the topic like an experienced professor.
+Expand wherever necessary using your own knowledge while remaining technically accurate.
+Output Requirements
+Return ONLY ONE COMPLETE HTML DOCUMENT.
+Do NOT output Markdown.
+Do NOT explain anything outside HTML.
+The HTML should be immediately usable by saving it as:
+dayX.html
+and opening it in a browser.
+No placeholders.
+No incomplete sections.
+No missing CSS.
+Design Requirements
+The HTML must resemble modern educational documentation.
+Use the following design:
+• Light gray page background (#f8f9fa)
+• White content cards
+• Primary blue (#0056b3)
+• Orange highlight color (#d35400)
+• Green badges (#27ae60)
+• Font:
+Segoe UI, Tahoma, Geneva, Verdana, sans-serif
+• Maximum width:
+900–1000px
+• Center aligned layout
+• Responsive Design
+• Beautiful spacing
+• Rounded corners
+• Smooth shadows
+• Hover effects where appropriate
+Header
+Create a professional header containing:
+Course Name
+Lecture Title
+Instructor Name
+Day Number
+Lecture Duration
+Subtitle
+Beautiful blue background
+Rounded corners
+White text
+Table of Contents
+Generate a clickable Table of Contents linking to every major section.
+Timestamp Requirements
+Every important topic must contain timestamps exactly like:
+[00:12:35]
+Display timestamps inside beautiful gray rounded badges.
+Section Layout
+Each major section should contain:
+Introduction
+Definition
+Why it Exists
+Problem it Solves
+How it Works
+Step-by-Step Explanation
+Real-world Example
+Industry Use Cases
+Advantages
+Disadvantages
+Interview Questions
+Exam Notes
+Common Mistakes
+Best Practices
+Key Takeaways
+HTML Components
+Use attractive components throughout the notes.
+Include:
+Information Boxes
+Definition Boxes
+Example Boxes
+Warning Boxes
+Interview Tip Boxes
+Best Practice Boxes
+Important Note Boxes
+Summary Boxes
+Memory Trick Boxes
+Visual Components
+Whenever possible create visual explanations using only HTML and CSS.
+Include:
+Flowcharts
+Pipelines
+Architecture diagrams
+Step-by-step diagrams
+Comparison diagrams
+Lifecycle diagrams
+Process diagrams
+Avoid using images.
+Use HTML boxes, arrows, and CSS instead.
+Tables
+Create professional comparison tables whenever useful.
+Examples:
+Bag of Words vs TF-IDF
+RNN vs LSTM
+CNN vs RNN
+Stemming vs Lemmatization
+Transformer vs BERT
+Advantages vs Disadvantages
+Algorithms Comparison
+Libraries Comparison
+Examples
+Every important concept must include examples.
+Use:
+Input
+Output
+Explanation
+Real-life Analogy
+Practical Example
+Python Example (if applicable)
+Code Blocks
+Whenever coding is discussed include syntax-highlighted code blocks.
+Supported languages:
+Python
+Scikit-learn
+TensorFlow
+PyTorch
+NLTK
+SpaCy
+Transformers
+HuggingFace
+LangChain
+SQL
+Use a professional dark-theme code style.
+Explanation Style
+Write in a university textbook style.
+Beginner friendly.
+Technically accurate.
+Well structured.
+Explain:
+What?
+Why?
+How?
+When?
+Where?
+Advantages
+Limitations
+Interview importance
+Industry relevance
+Do not copy the instructor's words.
+Rewrite everything in your own words.
+Improve explanations wherever possible.
+Interview Preparation
+After every major topic include:
+Frequently Asked Interview Questions
+Expected Answers
+Tricky Questions
+Common Confusions
+Cheat Sheet
+At the end generate:
+Quick Revision
+Cheat Sheet
+Important Definitions
+Important Formulas
+Important Algorithms
+Key Concepts
+Memory Tricks
+Important Libraries
+Important Commands
+Final Summary
+Include:
+One-page Revision
+Key Takeaways
+Roadmap for Next Topics
+Further Reading
+Useful Resources
+Quality Rules
+Watch/analyze the complete lecture before writing.
+Never skip topics.
+Never leave incomplete explanations.
+Expand topics wherever the instructor assumes prior knowledge.
+Correct factual mistakes if present.
+Make the notes significantly better than the lecture.
+Maintain consistent formatting throughout.
+The final HTML should resemble professional documentation from Microsoft, Google, AWS, or MDN while remaining beginner-friendly.
+Generate publication-quality notes that can be directly hosted on GitHub Pages without further editing. 
