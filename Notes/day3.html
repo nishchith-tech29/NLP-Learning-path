@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Study Notes: TF-IDF & Natural Language Processing</title>
+    <style>
+        /* Base Variables and Reset */
+        :root {
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --primary-blue: #0056b3;
+            --orange-highlight: #d35400;
+            --green-badge: #27ae60;
+            --text-dark: #333333;
+            --text-muted: #666666;
+            --gray-badge: #e9ecef;
+            --border-radius: 8px;
+            --shadow: 0 4px 6px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.1);
+            --hover-shadow: 0 10px 15px rgba(0,0,0,0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        /* Container Layout */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Header Styling */
+        .page-header {
+            background: linear-gradient(135deg, #0056b3, #004494);
+            color: #ffffff;
+            padding: 40px;
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .page-header p.subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .header-meta {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .header-meta span {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Content Cards */
+        .card {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--hover-shadow);
+        }
+
+        /* Headings inside cards */
+        h2 {
+            color: var(--primary-blue);
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            margin-top: 10px;
+            font-size: 1.8rem;
+        }
+
+        h3 {
+            color: var(--text-dark);
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        /* Timestamps */
+        .timestamp {
+            display: inline-block;
+            background-color: var(--gray-badge);
+            color: #495057;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-family: monospace;
+            font-weight: bold;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        /* Table of Contents */
+        .toc {
+            background-color: #f1f8ff;
+            border-left: 4px solid var(--primary-blue);
+            padding: 20px;
+            border-radius: var(--border-radius);
+        }
+        
+        .toc ul {
+            list-style: none;
+            padding-left: 10px;
+        }
+
+        .toc li {
+            margin-bottom: 8px;
+        }
+
+        .toc a {
+            text-decoration: none;
+            color: var(--primary-blue);
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .toc a:hover {
+            color: var(--orange-highlight);
+            text-decoration: underline;
+        }
+
+        /* Custom Information Boxes */
+        .box {
+            padding: 15px 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+            border-left: 4px solid;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .box-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .def-box { border-left-color: var(--primary-blue); background-color: #f0f7ff; }
+        .def-box .box-title { color: var(--primary-blue); }
+
+        .info-box { border-left-color: #17a2b8; background-color: #f0fbfc; }
+        .info-box .box-title { color: #17a2b8; }
+
+        .example-box { border-left-color: var(--green-badge); background-color: #f4fdf8; }
+        .example-box .box-title { color: var(--green-badge); }
+
+        .warning-box { border-left-color: #e74c3c; background-color: #fdf3f2; }
+        .warning-box .box-title { color: #e74c3c; }
+
+        .interview-box { border-left-color: var(--orange-highlight); background-color: #fef8f4; }
+        .interview-box .box-title { color: var(--orange-highlight); }
+
+        .best-practice-box { border-left-color: #8e44ad; background-color: #f9f4fc; }
+        .best-practice-box .box-title { color: #8e44ad; }
+        
+        .memory-box { border-left-color: #f1c40f; background-color: #fffdef; }
+        .memory-box .box-title { color: #d4ac0d; }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        th {
+            background-color: var(--primary-blue);
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        tr:hover {
+            background-color: #f1f8ff;
+        }
+
+        /* Code Blocks */
+        pre {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.95rem;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        code {
+            font-family: inherit;
+        }
+
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; font-style: italic; }
+        .function { color: #dcdcaa; }
+        .number { color: #b5cea8; }
+
+        /* HTML/CSS Visual Diagrams */
+        .diagram-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border: 1px dashed #ccc;
+            border-radius: 8px;
+        }
+
+        .diagram-node {
+            background-color: var(--card-bg);
+            border: 2px solid var(--primary-blue);
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            min-width: 120px;
+        }
+
+        .diagram-arrow {
+            color: var(--primary-blue);
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .diagram-vertical {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        /* Lists */
+        ul, ol {
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+
+        .highlight {
+            background-color: rgba(211, 84, 0, 0.1);
+            color: var(--orange-highlight);
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <header class="page-header">
+        <h1>TF-IDF & Practical NLP Implementations</h1>
+        <p class="subtitle">Transforming Text into Meaningful Mathematical Vectors</p>
+        <div class="header-meta">
+            <span>📚 Course: Natural Language Processing (NLP)</span>
+            <span>👨‍🏫 Instructor: Krish Naik</span>
+            <span>📅 Day 3</span>
+            <span>⏱ Duration: 1h 14m</span>
+        </div>
+    </header>
+
+    <div class="card">
+        <div class="toc">
+            <h2 style="border: none; margin-top: 0; padding-bottom: 0;">Table of Contents</h2>
+            <ul>
+                <li><a href="#sec-intro">1. Introduction & Revision of Bag of Words (BoW)</a></li>
+                <li><a href="#sec-limitations-bow">2. The Limitations of Bag of Words</a></li>
+                <li><a href="#sec-tfidf-def">3. Introduction to TF-IDF</a></li>
+                <li><a href="#sec-math">4. The Mathematics: Step-by-Step Calculation</a></li>
+                <li><a href="#sec-practical">5. Practical Implementation using Python</a></li>
+                <li><a href="#sec-ngrams">6. N-Grams and Feature Optimization</a></li>
+                <li><a href="#sec-interview">7. Interview Preparation & Questions</a></li>
+                <li><a href="#sec-cheatsheet">8. Final Cheat Sheet & Roadmap</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card" id="sec-intro">
+        <h2><span class="timestamp">[00:06:32]</span> 1. Introduction & Revision of Bag of Words (BoW)</h2>
+        
+        <p>Before diving into advanced techniques, it is essential to revisit the foundational concept of converting text into vectors: <strong>Bag of Words (BoW)</strong>. Machine learning models cannot understand raw text; they only comprehend numbers. BoW is the simplest technique to translate textual documents into a structured matrix of numbers.</p>
+
+        <div class="def-box box">
+            <div class="box-title">📖 Definition: Bag of Words</div>
+            <p>A natural language processing technique that extracts features from text by representing the occurrence (frequency) of words within a document, completely ignoring the order and context of the words (hence, a "bag").</p>
+        </div>
+
+        <h3>How Bag of Words Works (Pipeline)</h3>
+        <p>To convert sentences to vectors, text must pass through a strict preprocessing pipeline:</p>
+        
+        <div class="diagram-container">
+            <div class="diagram-node">Raw Text</div>
+            <div class="diagram-arrow">&#8594;</div>
+            <div class="diagram-node">Tokenization</div>
+            <div class="diagram-arrow">&#8594;</div>
+            <div class="diagram-node">Stop Words Removal & Lowercasing</div>
+            <div class="diagram-arrow">&#8594;</div>
+            <div class="diagram-node">Stemming / Lemmatization</div>
+            <div class="diagram-arrow">&#8594;</div>
+            <div class="diagram-node">Frequency Matrix (BoW)</div>
+        </div>
+
+        <div class="example-box box">
+            <div class="box-title">💡 Example Pipeline</div>
+            <p><strong>Input Sentences:</strong></p>
+            <ul>
+                <li>S1: "He is a good boy"</li>
+                <li>S2: "She is a good girl"</li>
+                <li>S3: "Boy and girl are good"</li>
+            </ul>
+            <p><strong>After Stop words (is, a, he, she, and, are) & Lowercasing:</strong></p>
+            <ul>
+                <li>S1: <code>good boy</code></li>
+                <li>S2: <code>good girl</code></li>
+                <li>S3: <code>boy girl good</code></li>
+            </ul>
+            <p><strong>Vocabulary:</strong> <code>[boy, girl, good]</code></p>
+            <p><strong>Output Vectors:</strong></p>
+            <ul>
+                <li>S1: <code>[1, 0, 1]</code></li>
+                <li>S2: <code>[0, 1, 1]</code></li>
+                <li>S3: <code>[1, 1, 1]</code></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card" id="sec-limitations-bow">
+        <h2><span class="timestamp">[00:11:37]</span> 2. The Limitations of Bag of Words</h2>
+        
+        <p>While conceptually intuitive, the Bag of Words model suffers from critical architectural flaws when applied to real-world, large-scale NLP problems.</p>
+
+        <div class="warning-box box">
+            <div class="box-title">⚠️ The 3 Major Problems with BoW</div>
+            <ol>
+                <li><strong>Sparsity Issue:</strong> If a corpus contains 10,000 unique words, each sentence is represented by a vector of 10,000 dimensions. Most of these values will be <code>0</code>. This creates a vast sparse matrix that consumes immense memory and computational power.</li>
+                <li><strong>Out of Vocabulary (OOV) Issue:</strong> If the model is trained on a specific vocabulary, and a new sentence during testing contains an unseen word (e.g., "cat"), the BoW model will simply ignore it, losing valuable information.</li>
+                <li><strong>Loss of Semantic Meaning & Word Importance:</strong> BoW treats all words equally based solely on frequency. For example, if "The food is good" and "The food is not good" are processed, and "not" is mistakenly removed as a stop word, the vectors become identical. Furthermore, highly frequent words (like "good" across many reviews) dominate the matrix, even if they aren't uniquely identifying for a specific document.</li>
+            </ol>
+        </div>
+
+        <div class="memory-box box">
+            <div class="box-title">🧠 Memory Trick</div>
+            <p>Think of Bag of Words like a popularity contest. The loudest (most frequent) words win, but they might not be the smartest or most informative words.</p>
+        </div>
+    </div>
+
+    <div class="card" id="sec-tfidf-def">
+        <h2><span class="timestamp">[00:14:55]</span> 3. Introduction to TF-IDF</h2>
+        
+        <p>To fix the semantic meaning issue of BoW, we introduce <strong>TF-IDF (Term Frequency-Inverse Document Frequency)</strong>. The core philosophy of TF-IDF is to <em>penalize highly frequent words</em> that appear across all documents and <em>reward rare words</em> that appear in a specific document, as they carry the actual distinct meaning.</p>
+
+        <div class="def-box box">
+            <div class="box-title">📖 Definition: TF-IDF</div>
+            <p>A statistical measure that evaluates how relevant a word is to a document in a collection of documents. This is done by multiplying two metrics: how many times a word appears in a document (TF), and the inverse document frequency of the word across a set of documents (IDF).</p>
+        </div>
+
+        <h3>The Two Pillars of TF-IDF</h3>
+        
+        <div class="diagram-container">
+            <div class="diagram-node" style="background:#e8f4fd;">
+                <strong>Term Frequency (TF)</strong><br>
+                Captures the local importance of a word.<br>
+                <em>"How often does the word appear in THIS specific sentence?"</em>
+            </div>
+            <div class="diagram-arrow">✖</div>
+            <div class="diagram-node" style="background:#fdf4e8;">
+                <strong>Inverse Document Frequency (IDF)</strong><br>
+                Captures the global rarity of a word.<br>
+                <em>"How rare is this word across ALL sentences?"</em>
+            </div>
+            <div class="diagram-arrow">🟰</div>
+            <div class="diagram-node" style="background:#e8fdf0;">
+                <strong>TF-IDF Weight</strong><br>
+                True importance of the word.
+            </div>
+        </div>
+
+        <p><strong>Industry Use Cases:</strong> Document retrieval (Search Engines like Google), Keyword extraction, Text summarization, and spam detection pipelines.</p>
+    </div>
+
+    <div class="card" id="sec-math">
+        <h2><span class="timestamp">[00:20:56]</span> 4. The Mathematics: Step-by-Step Calculation</h2>
+        
+        <p>Let us demystify the mathematics behind TF-IDF using textbook formulas. A deep understanding of these formulas is required to clear advanced data science interviews.</p>
+
+        <div class="info-box box">
+            <div class="box-title">🧮 Important Formulas</div>
+            <p><strong>Term Frequency (TF):</strong><br>
+            <code>TF = (Number of repetitions of word 'w' in sentence) / (Total number of words in sentence)</code></p>
+            <hr style="border: 0; border-bottom: 1px solid #ccc; margin: 10px 0;">
+            <p><strong>Inverse Document Frequency (IDF):</strong><br>
+            <code>IDF = log_e (Total number of sentences / Number of sentences containing the word 'w')</code></p>
+            <p><em>Final TF-IDF Score = TF * IDF</em></p>
+        </div>
+
+        <h3>Step-by-Step Practical Calculation <span class="timestamp">[00:22:57]</span></h3>
+        <p>Let's use our cleaned corpus:<br>
+        S1: <code>good boy</code><br>
+        S2: <code>good girl</code><br>
+        S3: <code>boy girl good</code><br>
+        Total Sentences (N) = 3</p>
+
+        <h4>Step 1: Calculate TF</h4>
+        <table>
+            <tr>
+                <th>Word</th>
+                <th>S1 (2 words)</th>
+                <th>S2 (2 words)</th>
+                <th>S3 (3 words)</th>
+            </tr>
+            <tr>
+                <td><strong>good</strong></td>
+                <td>1/2 = 0.5</td>
+                <td>1/2 = 0.5</td>
+                <td>1/3 ≈ 0.33</td>
+            </tr>
+            <tr>
+                <td><strong>boy</strong></td>
+                <td>1/2 = 0.5</td>
+                <td>0/2 = 0</td>
+                <td>1/3 ≈ 0.33</td>
+            </tr>
+            <tr>
+                <td><strong>girl</strong></td>
+                <td>0/2 = 0</td>
+                <td>1/2 = 0.5</td>
+                <td>1/3 ≈ 0.33</td>
+            </tr>
+        </table>
+
+        <h4>Step 2: Calculate IDF <span class="timestamp">[00:27:47]</span></h4>
+        <table>
+            <tr>
+                <th>Word</th>
+                <th>Sentences Containing Word</th>
+                <th>IDF Calculation</th>
+                <th>Result</th>
+            </tr>
+            <tr>
+                <td><strong>good</strong></td>
+                <td>3 (S1, S2, S3)</td>
+                <td>log_e (3/3) = log_e(1)</td>
+                <td><strong>0</strong></td>
+            </tr>
+            <tr>
+                <td><strong>boy</strong></td>
+                <td>2 (S1, S3)</td>
+                <td>log_e (3/2)</td>
+                <td><strong>~0.405</strong></td>
+            </tr>
+            <tr>
+                <td><strong>girl</strong></td>
+                <td>2 (S2, S3)</td>
+                <td>log_e (3/2)</td>
+                <td><strong>~0.405</strong></td>
+            </tr>
+        </table>
+
+        <h4>Step 3: Calculate Final TF-IDF Matrix (TF * IDF) <span class="timestamp">[00:30:17]</span></h4>
+        <p>Notice the magic here: Because "good" is present in every sentence, its IDF is 0. Therefore, its final TF-IDF score for every sentence becomes 0. The algorithm has successfully identified that "good" is a common, uninformative word!</p>
+        <table>
+            <tr>
+                <th>Word</th>
+                <th>S1 Vector</th>
+                <th>S2 Vector</th>
+                <th>S3 Vector</th>
+            </tr>
+            <tr>
+                <td><strong>good</strong></td>
+                <td>0.5 * 0 = 0</td>
+                <td>0.5 * 0 = 0</td>
+                <td>0.33 * 0 = 0</td>
+            </tr>
+            <tr>
+                <td><strong>boy</strong></td>
+                <td>0.5 * 0.405 = 0.202</td>
+                <td>0 * 0.405 = 0</td>
+                <td>0.33 * 0.405 = 0.133</td>
+            </tr>
+            <tr>
+                <td><strong>girl</strong></td>
+                <td>0 * 0.405 = 0</td>
+                <td>0.5 * 0.405 = 0.202</td>
+                <td>0.33 * 0.405 = 0.133</td>
+            </tr>
+        </table>
+
+        <div class="best-practice-box box">
+            <div class="box-title">✅ Advantage Achieved <span class="timestamp">[00:34:05]</span></div>
+            <p><strong>Word importance is finally captured!</strong> Rare words that define the specific context of a document get higher weights, while universally common words are zeroed out or heavily penalized. This vastly improves model accuracy for classification tasks.</p>
+        </div>
+    </div>
+
+    <div class="card" id="sec-practical">
+        <h2><span class="timestamp">[00:35:33]</span> 5. Practical Implementation using Python</h2>
+        
+        <p>In industry, we rely on the <code>scikit-learn</code> library to handle this math efficiently. Below is the production-grade implementation code.</p>
+
+        <pre><code class="keyword">from</code> sklearn.feature_extraction.text <span class="keyword">import</span> TfidfVectorizer
+<span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+
+<span class="comment"># 1. Define the cleaned corpus</span>
+corpus = [
+    <span class="string">"good boy"</span>,
+    <span class="string">"good girl"</span>,
+    <span class="string">"boy girl good"</span>
+]
+
+<span class="comment"># 2. Initialize the Vectorizer</span>
+<span class="comment"># (Scikit-learn implements a slightly smoothed version of the IDF formula by default to avoid zero division)</span>
+tfidf = TfidfVectorizer()
+
+<span class="comment"># 3. Fit and Transform the text data</span>
+X = tfidf.fit_transform(corpus)
+
+<span class="comment"># 4. View Results in a Pandas DataFrame for readability</span>
+feature_names = tfidf.get_feature_names_out()
+df = pd.DataFrame(X.toarray(), columns=feature_names)
+
+<span class="function">print</span>(df)</code></pre>
+    </div>
+
+    <div class="card" id="sec-ngrams">
+        <h2><span class="timestamp">[00:42:23]</span> 6. N-Grams and Feature Optimization</h2>
+        
+        <p>When applying Bag of Words (<code>CountVectorizer</code>) or <code>TfidfVectorizer</code>, single words (unigrams) might not capture enough context. For example, "not good" has a completely different meaning than "not" and "good" separately. This is solved by <strong>N-Grams</strong>.</p>
+
+        <div class="def-box box">
+            <div class="box-title">📖 Definition: N-Gram</div>
+            <p>A contiguous sequence of <em>n</em> items from a given sample of text.
+            <br>• <strong>Unigram:</strong> "subscribe", "to", "krish"
+            <br>• <strong>Bigram (2-gram):</strong> "subscribe to", "to krish"
+            <br>• <strong>Trigram (3-gram):</strong> "subscribe to krish"</p>
+        </div>
+
+        <h3>Using <code>ngram_range</code> in Scikit-Learn</h3>
+        <p>By passing <code>ngram_range=(2, 3)</code>, the vectorizer will generate both bigrams and trigrams, enriching the feature set with semantic phrases.</p>
+
+        <pre><code class="keyword">from</code> sklearn.feature_extraction.text <span class="keyword">import</span> CountVectorizer
+
+<span class="comment"># Extracts Bigrams and Trigrams combined</span>
+cv = CountVectorizer(ngram_range=(<span class="number">2</span>, <span class="number">3</span>)) 
+X_ngrams = cv.fit_transform(corpus)</code></pre>
+
+        <h3>Managing Sparsity with <code>max_features</code> <span class="timestamp">[00:48:40]</span></h3>
+        <p>If you create trigrams for a large dataset, your feature space will explode, leading to the Curse of Dimensionality. To prevent this, use the <code>max_features</code> parameter.</p>
+        <div class="diagram-vertical">
+            <div class="diagram-node">Original Corpus: 50,000 unique words/phrases</div>
+            <div class="diagram-arrow">↓</div>
+            <div class="diagram-node"><code>TfidfVectorizer(max_features=5000)</code></div>
+            <div class="diagram-arrow">↓</div>
+            <div class="diagram-node">Keeps only the top 5,000 most frequent terms. Drops the rest.</div>
+        </div>
+
+        <p>This single hyperparameter vastly reduces memory usage and speeds up model training times.</p>
+    </div>
+
+    <div class="card" id="sec-interview">
+        <h2>7. Interview Preparation & Questions</h2>
+        
+        <p>Be prepared to answer these highly requested interview questions regarding text vectorization techniques.</p>
+
+        <div class="interview-box box">
+            <div class="box-title">🎤 Q1: What is the primary difference between Bag of Words and TF-IDF?</div>
+            <p><strong>Expected Answer:</strong> Bag of Words (BoW) creates vectors based purely on the raw frequency/count of words in a document. It treats all words equally. TF-IDF, however, scales down the frequency of words that occur universally across all documents (like 'is', 'the', 'good') and scales up rare, specific terms. Thus, TF-IDF captures the semantic importance of words better than BoW.</p>
+        </div>
+
+        <div class="interview-box box">
+            <div class="box-title">🎤 Q2: Does TF-IDF solve the Out of Vocabulary (OOV) problem?</div>
+            <p><strong>Expected Answer:</strong> No. Neither Bag of Words nor TF-IDF solves the OOV problem. If a word is missing during the training phase (fitting the vocabulary), both algorithms will simply drop/ignore the word if it appears during testing. To solve the OOV and pure semantic relationships, we must shift to Word Embeddings like Word2Vec or GloVe.</p>
+        </div>
+
+        <div class="interview-box box">
+            <div class="box-title">🎤 Q3: Why is standardizing or limiting vocabulary important?</div>
+            <p><strong>Expected Answer:</strong> Because NLP algorithms suffer from sparsity. If a corpus has 100,000 unique terms, every sentence is represented by a 100k-dimensional vector mostly filled with zeroes. This takes massive RAM and computing power. Limiting vocabulary using parameters like <code>max_features</code> restricts the model to the top N most frequent terms, reducing dimensionality while preserving the most crucial data.</p>
+        </div>
+
+        <h3>Comparison Table: BoW vs TF-IDF</h3>
+        <table>
+            <tr>
+                <th>Feature</th>
+                <th>Bag of Words (CountVectorizer)</th>
+                <th>TF-IDF (TfidfVectorizer)</th>
+            </tr>
+            <tr>
+                <td><strong>Values generated</strong></td>
+                <td>Integers (Counts: 0, 1, 2...)</td>
+                <td>Floats (Ratios: 0.0 to 1.0)</td>
+            </tr>
+            <tr>
+                <td><strong>Word Importance</strong></td>
+                <td>Equal weighting for all words</td>
+                <td>Higher weight for rare/specific words</td>
+            </tr>
+            <tr>
+                <td><strong>Semantic Context</strong></td>
+                <td>Very Poor</td>
+                <td>Slightly Better (Identifies key themes)</td>
+            </tr>
+            <tr>
+                <td><strong>Out of Vocabulary Handling</strong></td>
+                <td>Fails (Ignores word)</td>
+                <td>Fails (Ignores word)</td>
+            </tr>
+            <tr>
+                <td><strong>Best For</strong></td>
+                <td>Basic spam filters, simple occurrence checks</td>
+                <td>Document classification, Search engines</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="card" id="sec-cheatsheet">
+        <h2>8. Final Cheat Sheet & Roadmap</h2>
+
+        <div class="summary-box box">
+            <div class="box-title">⚡ Quick Revision Cheat Sheet</div>
+            <ul>
+                <li><strong>Bag of Words (BoW):</strong> Text -> Word Frequencies. Suffers from sparsity and equal word weightage.</li>
+                <li><strong>TF (Term Frequency):</strong> Occurrence of word in a document / Total words in the document.</li>
+                <li><strong>IDF (Inverse Document Frequency):</strong> log(Total Documents / Documents containing the word).</li>
+                <li><strong>TF-IDF Weight:</strong> TF × IDF. Penalizes common terms, highlights document-specific terms.</li>
+                <li><strong>N-Grams:</strong> Combining adjacent words to preserve local sequence (e.g., bigrams, trigrams).</li>
+                <li><strong>max_features:</strong> Sklearn parameter to control matrix sparsity by selecting top N highest-frequency words across the corpus.</li>
+                <li><strong>Scikit-Learn Classes:</strong> <code>CountVectorizer</code> for BoW, <code>TfidfVectorizer</code> for TF-IDF.</li>
+            </ul>
+        </div>
+
+        <h3>Roadmap for Next Topics</h3>
+        <p>While TF-IDF is a massive step up from Bag of Words, it still fundamentally fails to understand true semantic meaning (e.g., that "King" and "Queen" are related concepts, or dealing with unseen OOV words). To solve this, the NLP industry relies on Deep Learning techniques.</p>
+        
+        <div class="diagram-container" style="background-color: var(--card-bg); border-color: var(--green-badge);">
+            <div class="diagram-node" style="border-color: var(--green-badge); color: var(--green-badge);">Next Week: Word Embeddings</div>
+            <div class="diagram-arrow" style="color: var(--green-badge);">&#8594;</div>
+            <div class="diagram-node" style="border-color: var(--green-badge); color: var(--green-badge);">Word2Vec (CBOW & Skip-Gram)</div>
+            <div class="diagram-arrow" style="color: var(--green-badge);">&#8594;</div>
+            <div class="diagram-node" style="border-color: var(--green-badge); color: var(--green-badge);">GloVe (Global Vectors)</div>
+        </div>
+        
+    </div>
+
+</div>
+
+</body>
+</html>
