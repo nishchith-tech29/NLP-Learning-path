@@ -602,7 +602,8 @@ df = pd.<span class="fn">read_csv</span>(<span class="str">'SMSSpamCollection'</
             <li><strong>Bag of Words (CountVectorizer):</strong> Counts how often each token appears in a document. When initialized with <code>binary=True</code>, it acts as a boolean indicator ($\{0,1\}$) of a word's presence or absence. This approach reduces model sensitivity to repetitive keyword patterns often used in spam messages.</li>
             <li><strong>TF-IDF Vectorization:</strong> Scales token counts by how frequently they appear across all documents in the corpus, down-weighting universally common words:
                 <div class="math-block">
-                    <span class="math-expr">TF-IDF(t, d, D) = TF(t, d) &times; \log\left(rac{|D|}{1 + |\{d \in D : t \in d\}|}ight)</span>
+                    <span class="math-expr">TF-IDF(t, d, D) = TF(t, d) &times; \log\left(rac{|D|}{1 + |\{d \in D : t \in d\}|}
+ight)</span>
                 </div>
             </li>
         </ul>
@@ -856,7 +857,8 @@ y_predictions = classifier.<span class="fn">predict</span>(X_test)
 
         <h3>Core Math Transformations</h3>
         <ul class="styled-list">
-            <li><strong>TF-IDF Weights:</strong> $	ext{TF-IDF}(t, d, D) = 	ext{TF}(t, d) 	imes \log\left(rac{|D|}{1 + |\{d \in D : t \in d\}|}ight)$</li>
+            <li><strong>TF-IDF Weights:</strong> $	ext{TF-IDF}(t, d, D) = 	ext{TF}(t, d) 	imes \log\left(rac{|D|}{1 + |\{d \in D : t \in d\}|}
+ight)$</li>
             <li><strong>Document Averaging Layer:</strong> $ec{V}_{D} = rac{1}{|D \cap \mathcal{V}|} \sum_{w \in D \cap \mathcal{V}} ec{v}_w$</li>
         </ul>
 
