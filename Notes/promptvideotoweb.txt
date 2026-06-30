@@ -179,5 +179,21 @@ Expand topics wherever the instructor assumes prior knowledge.
 Correct factual mistakes if present.
 Make the notes significantly better than the lecture.
 Maintain consistent formatting throughout.
+Mathematical Notation (Mandatory)
+
+Whenever the lecture contains formulas, equations, mathematical symbols, algorithms, statistics, probability, linear algebra, calculus, machine learning, deep learning, or scientific notation, automatically convert all plain-text mathematics into professional LaTeX notation.
+
+Examples:
+
+Loss = L(y, y_hat) → $Loss=\mathcal{L}(y,\hat{y})$
+x belongs to R^(d x 1) → $x \in \mathbb{R}^{d \times 1}$
+h_t=tanh(W_hx*x_t+W_hh*h_(t-1)+b_h) → $h_t=\tanh(W_{hx}\cdot x_t+W_{hh}\cdot h_{t-1}+b_h)$
+P(A|B) → $P(A\mid B)$
+
+Use proper LaTeX commands such as \mathcal, \mathbb, \mathbf, \hat, \sum, \frac, \sqrt, \log, \arg\max, \arg\min, Greek letters, subscripts, superscripts, vectors, matrices, and \left...\right delimiters where appropriate.
+
+Use $...$ for inline equations and $$...$$ for important display equations.
+
+Include MathJax in the HTML <head> so all equations render correctly in the browser.
 The final HTML should resemble professional documentation from Microsoft, Google, AWS, or MDN while remaining beginner-friendly.
 Generate publication-quality notes that can be directly hosted on GitHub Pages without further editing. 
