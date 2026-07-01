@@ -6,7 +6,7 @@ A collection of my structured notes created while following the **Krish Naik NLP
 
 👉 **Read the notes here:**
 
-**https://nishchith-tech29.github.io/NLP/**
+**[https://nishchith-tech29.github.io/NLP/](https://nishchith-tech29.github.io/NLP-Learning-path/)**
 
 ---
 
