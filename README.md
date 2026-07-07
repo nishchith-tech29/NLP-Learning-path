@@ -1,7 +1,7 @@
 # 🧠 NLP Repository
 
 ## 📌 Overview
-This repository documents my Natural Language Processing (NLP) learning journey along with hands-on coding practice and real-world projects. It includes notes, Jupyter notebooks.
+This repository documents my Natural Language Processing (NLP) learning journey along with hands-on coding practice and real-world projects.  includes notes, Jupyter notebooks.
 
 The goal of this repo is to:
 - Learn NLP from basics to advanced
